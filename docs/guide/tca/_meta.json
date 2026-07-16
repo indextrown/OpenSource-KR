@@ -1,0 +1,25 @@
+[
+  {
+    "type": "file",
+    "name": "readme",
+    "label": "TCA 소개"
+  },
+  "what-is-navigation",
+  "tree-based-navigation",
+  "stack-based-navigation",
+  "reducer",
+  "scope",
+  "store",
+  "effect",
+  "sharing-state",
+  "test-store",
+  "testing",
+  "performance",
+  {
+    "type": "dir",
+    "name": "dependencies",
+    "label": "Dependencies",
+    "collapsible": true,
+    "collapsed": true
+  }
+]
