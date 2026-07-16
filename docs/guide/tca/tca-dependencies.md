@@ -1,6 +1,6 @@
 ---
 title: TCA Dependencies 사용법
-description: TCA에서 @Dependency로 시간·UUID·API 같은 외부 의존성을 사용하고 테스트·Preview에서 재정의하며 사용자 정의 client를 등록하는 학습 순서를 안내합니다.
+description: TCA에서 client를 직접 만들고 DependencyKey·DependencyValues·@Dependency로 등록해 테스트와 Preview에서 안전하게 재정의하는 흐름을 안내합니다.
 ---
 
 # TCA Dependencies 사용법
@@ -86,25 +86,97 @@ func addTodo() async {
 
 테스트가 실제 시간이나 무작위 UUID에 의존하지 않으므로 빠르고 결정적으로 실행됩니다. clock을 쓴다면 `.immediate` clock으로 바꿔 실제 대기를 없앨 수도 있어요.
 
-### 3. 직접 만든 API는 client로 등록해요
+### 3. 직접 만든 client를 `DependencyKey`로 등록해요
 
-기본 제공 의존성에 없는 API client는 interface를 만들고 `DependencyValues`에 등록합니다. 가장 간단한 방식은 `@DependencyEntry`예요.
+기본 제공 의존성에 없는 API는 client struct로 interface를 먼저 만들어요. TCA에서 기본으로 익힐 패턴은 client가 `DependencyKey`를 직접 준수하고, `DependencyValues`의 key path로 노출하는 방식입니다. 공식 TCA README도 이 흐름을 사용해요.
+
+예를 들어 숫자에 관한 사실을 가져오는 API를 client로 분리해 보겠습니다.
 
 ```swift
-import Dependencies
-import DependenciesMacros
+import ComposableArchitecture
+import Foundation
 
-struct TodosClient {
-  var fetch: @Sendable () async throws -> [Todo]
-}
-
-extension DependencyValues {
-  @DependencyEntry(liveValue: TodosClient.live)
-  var todosClient: TodosClient
+struct NumberFactClient {
+  var fetch: (Int) async throws -> String
 }
 ```
 
-그러면 기능에서는 `@Dependency(\.todosClient)`로 사용하고, 테스트에서는 `$0.todosClient.fetch = { [] }`처럼 필요한 endpoint만 바꿀 수 있어요. live·Preview·test 구현을 분리해야 한다면 `DependencyKey`와 `TestDependencyKey`를 사용합니다.
+client에는 기능이 실제로 호출할 endpoint만 넣습니다. reducer가 `fetch`만 필요하다면 HTTP 라이브러리나 URLSession 전체를 넘기지 않아요. 그러면 기능의 경계가 작아지고 테스트도 필요한 동작만 재정의할 수 있습니다.
+
+다음으로 실제 앱에서 쓸 live 구현을 `DependencyKey`에 제공합니다.
+
+```swift
+extension NumberFactClient: DependencyKey {
+  static let liveValue = Self(
+    fetch: { number in
+      let (data, _) = try await URLSession.shared.data(
+        from: URL(string: "http://number-trivia.com/\(number)")!
+      )
+      return String(decoding: data, as: UTF8.self)
+    }
+  )
+}
+```
+
+마지막으로 `DependencyValues`를 확장해 `@Dependency`와 테스트 재정의에 사용할 key path를 만듭니다.
+
+```swift
+extension DependencyValues {
+  var numberFact: NumberFactClient {
+    get { self[NumberFactClient.self] }
+    set { self[NumberFactClient.self] = newValue }
+  }
+}
+```
+
+### 4. reducer에서 client를 사용해요
+
+이제 reducer는 client를 생성자 인자로 받지 않고 `@Dependency`로 꺼냅니다.
+
+```swift
+@Reducer
+struct Feature {
+  @Dependency(\.numberFact) var numberFact
+
+  var body: some Reducer<State, Action> {
+    Reduce { state, action in
+      switch action {
+      case .numberFactButtonTapped:
+        return .run { [count = state.count] send in
+          let fact = try await numberFact.fetch(count)
+          await send(.numberFactResponse(fact))
+        }
+
+      // ...
+      }
+    }
+  }
+}
+```
+
+기기와 simulator에서는 `liveValue`가 자동으로 사용됩니다. 반면 테스트와 Preview에서는 필요한 구현을 안전하게 바꿀 수 있습니다.
+
+### 5. `TestStore`에서 endpoint만 재정의해요
+
+테스트는 네트워크를 호출하지 않고 `fetch` endpoint만 결정적인 값으로 바꿉니다.
+
+```swift
+@Test
+func numberFact() async {
+  let store = TestStore(initialState: Feature.State()) {
+    Feature()
+  } withDependencies: {
+    $0.numberFact.fetch = { "\($0) is a good number" }
+  }
+
+  await store.send(.numberFactButtonTapped)
+  await store.receive(.numberFactResponse("0 is a good number")) {
+    $0.numberFact = "0 is a good number"
+  }
+}
+```
+
+`@DependencyEntry`는 같은 모듈에 기본 구현을 간단히 등록할 때 쓸 수 있는 Dependencies의 편의 매크로입니다. 하지만 live 구현을 앱 target이나 integration module로 분리하거나, TCA client의 live·Preview·test 동작을 명확히 관리해야 한다면 위처럼 `DependencyKey`와 `DependencyValues`를 직접 작성하는 편이 더 알기 쉽고 유연합니다.
 
 ## 상황별로 읽을 문서
 
@@ -112,10 +184,10 @@ extension DependencyValues {
 | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | 의존성이 왜 필요한지, 어떤 값을 분리해야 하는지                   | [What are dependencies?](./dependencies/what-are-dependencies.md)                                        |
 | 기본 제공 `date`, `uuid`, `clock`을 바로 쓰는 방법                | [Quick start](./dependencies/quick-start.md), [Using dependencies](./dependencies/using-dependencies.md) |
-| 직접 만든 API client를 등록하는 방법                              | [Registering dependencies](./dependencies/registering-dependencies.md)                                   |
+| 직접 만든 TCA client를 등록하는 방법                              | [Registering dependencies](./dependencies/registering-dependencies.md)                                   |
 | 실제 앱·Preview·테스트 구현을 나누는 방법                         | [Live, preview, and test dependencies](./dependencies/live-preview-test.md)                              |
 | `TestStore`와 Swift Testing에서 재정의하는 방법                   | [Testing](./dependencies/testing.md)                                                                     |
-| protocol, closure 기반 struct, `@DependencyClient` 중 무엇을 쓸지 | [Designing dependencies](./dependencies/designing-dependencies.md)                                       |
+| protocol, closure 기반 client, `@DependencyClient` 중 무엇을 쓸지 | [Designing dependencies](./dependencies/designing-dependencies.md)                                       |
 | 특정 기능이나 자식 기능에서 잠시 값을 바꾸는 방법                 | [Overriding dependencies](./dependencies/overriding-dependencies.md)                                     |
 | task·escaping closure에서 의존성이 유지되는 방식                  | [Lifetimes](./dependencies/lifetimes.md)                                                                 |
 | 앱 진입점 하나로 값을 전파하는 방법                               | [Single entry point systems](./dependencies/single-entry-point-systems.md)                               |
