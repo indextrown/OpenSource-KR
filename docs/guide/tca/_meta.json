@@ -53,6 +53,11 @@
     "label": "Dependencies"
   },
   {
+    "type": "file",
+    "name": "tca-dependencies",
+    "label": "TCA Dependencies 사용법"
+  },
+  {
     "type": "dir",
     "name": "dependencies",
     "label": "Dependencies",
