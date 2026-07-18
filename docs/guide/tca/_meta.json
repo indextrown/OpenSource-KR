@@ -63,5 +63,16 @@
     "label": "Dependencies",
     "collapsible": true,
     "collapsed": true
+  },
+  {
+    "type": "section-header",
+    "label": "CasePaths"
+  },
+  {
+    "type": "dir",
+    "name": "case-paths",
+    "label": "CasePaths",
+    "collapsible": true,
+    "collapsed": true
   }
 ]
