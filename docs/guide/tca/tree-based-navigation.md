@@ -9,6 +9,8 @@ Optional과 enum으로 모델링하는 트리 기반 내비게이션을 알아�
 
 원문: [Tree-based navigation](https://swiftpackageindex.com/pointfreeco/swift-composable-architecture/main/documentation/composablearchitecture/treebasednavigation/)
 
+<!-- upstream-sync: pointfreeco/swift-composable-architecture@ead11e04e5011c437722c1990d22f80d87056978 | source: Sources/ComposableArchitecture/Documentation.docc/Articles/TreeBasedNavigation.md -->
+
 ## 개요
 
 트리 기반 내비게이션은 Optional과 enum 상태로 내비게이션을 모델링하는 방식입니다. 이 방식에서는 깊이 중첩된 상태를 만들고 SwiftUI에 전달하기만 하면, 앱의 어떤 상태로든 딥 링크할 수 있습니다. 나머지는 SwiftUI가 처리합니다.
@@ -477,7 +479,7 @@ func dismissal() {
       counter: CounterFeature.State(count: 3)
     )
   ) {
-    CounterFeature()
+    Feature()
   }
 }
 ```
@@ -522,7 +524,7 @@ func dismissal() {
       counter: CounterFeature.State(count: 3)
     )
   ) {
-    CounterFeature()
+    Feature()
   }
   store.exhaustivity = .off
 

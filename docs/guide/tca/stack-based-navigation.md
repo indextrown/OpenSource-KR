@@ -9,6 +9,8 @@ description: TCA에서 StackState와 StackAction으로 내비게이션 스택을
 
 원문: [Stack-based navigation](https://swiftpackageindex.com/pointfreeco/swift-composable-architecture/main/documentation/composablearchitecture/stackbasednavigation)
 
+<!-- upstream-sync: pointfreeco/swift-composable-architecture@ead11e04e5011c437722c1990d22f80d87056978 | source: Sources/ComposableArchitecture/Documentation.docc/Articles/StackBasedNavigation.md -->
+
 ## 개요
 
 스택 기반 내비게이션은 상태 컬렉션으로 내비게이션을 모델링하는 방식입니다. 평평한 데이터 컬렉션을 만들고 SwiftUI에 전달하기만 하면 앱의 어떤 상태로든 딥 링크할 수 있습니다. 나머지는 SwiftUI가 처리합니다. 앱에서 복잡하고 재귀적인 내비게이션 경로도 만들 수 있습니다.
@@ -213,7 +215,7 @@ case let .path(.element(id: id, action: .editItem(.saveButtonTapped))):
 
 ```swift
 case .closeButtonTapped:
-  state.popLast()
+  state.path.popLast()
   return .none
 ```
 
@@ -350,7 +352,7 @@ func dismissal() {
       ])
     )
   ) {
-    CounterFeature()
+    Feature()
   }
 }
 ```
@@ -443,7 +445,7 @@ func dismissal() {
       ])
     )
   ) {
-    CounterFeature()
+    Feature()
   }
   store.exhaustivity = .off
 
