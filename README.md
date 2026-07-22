@@ -40,4 +40,5 @@ npm run preview
 
 ## 배포
 
-`main` 브랜치에 푸시하면 GitHub Actions가 빌드한 뒤 GitHub Pages에 배포합니다. 저장소 **Settings → Pages**에서 Source를 **GitHub Actions**로 설정해야 합니다.
+`main` 브랜치에 푸시하면 GitHub Actions가 빌드한 뒤 GitHub Pages에 배포합니다.   
+저장소 **Settings → Pages**에서 Source를 **GitHub Actions**로 설정해야 합니다.
