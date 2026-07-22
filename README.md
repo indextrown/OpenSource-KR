@@ -1,10 +1,10 @@
-# OpenSource-KR
+# TCA-KR
 
-오픈소스 공식 문서를 자연스러운 한국어로 옮겨 읽기 쉽게 정리하는 문서 저장소입니다.
+The Composable Architecture 공식 문서를 자연스러운 한국어로 옮겨 읽기 쉽게 정리하는 문서 저장소입니다.
 
-현재는 [The Composable Architecture (TCA)](https://github.com/pointfreeco/swift-composable-architecture) 문서를 제공합니다. 앞으로 React Native 등 다른 오픈소스 문서를 같은 원칙으로 추가합니다.
+[The Composable Architecture (TCA)](https://github.com/pointfreeco/swift-composable-architecture) 문서와 TCA 사용에 필요한 Dependencies, CasePaths 문서를 제공합니다.
 
-문서 사이트: <https://indextrown.github.io/OpenSource-KR/>
+문서 사이트: <https://indextrown.github.io/TCA-KR/>
 
 ## 개발 환경
 
