@@ -1,11 +1,11 @@
 ---
 pageType: home
-title: Open Source KR
-description: 오픈소스 공식 문서를 한국어로 읽는 곳
+title: TCA-KR
+description: The Composable Architecture 공식 문서 한국어 번역
 
 hero:
-  name: Open Source KR
-  tagline: 오픈소스 공식 문서를 한국어로 읽는 곳
+  name: TCA-KR
+  tagline: The Composable Architecture 공식 문서 한국어 번역
   actions:
     - theme: brand
       text: TCA 문서 읽기
@@ -21,7 +21,7 @@ features:
   - title: 공식 원문 기반
     details: 모든 문서에서 원문과 공식 저장소를 함께 안내합니다.
     icon: 🔗
-  - title: 계속 확장 중
-    details: React Native를 비롯한 오픈소스 문서를 차례로 추가합니다.
+  - title: 함께 읽는 문서
+    details: TCA 사용에 필요한 Dependencies와 CasePaths 문서도 함께 제공합니다.
     icon: 📚
 ---

@@ -3,11 +3,11 @@ import { defineConfig } from '@rspress/core';
 
 export default defineConfig({
   root: path.join(__dirname, 'docs'),
-  base: '/OpenSource-KR/',
+  base: '/TCA-KR/',
   globalStyles: path.join(__dirname, 'theme/index.css'),
   lang: 'ko',
-  title: 'Open Source KR',
-  description: '오픈소스 공식 문서를 한국어로 읽는 곳',
+  title: 'TCA-KR',
+  description: 'The Composable Architecture 공식 문서 한국어 번역',
   icon: '/open-source-docs.svg',
   logo: {
     light: '/open-source-docs.svg',
@@ -22,7 +22,7 @@ export default defineConfig({
       {
         icon: 'github',
         mode: 'link',
-        content: 'https://github.com/indextrown/OpenSource-KR',
+        content: 'https://github.com/indextrown/TCA-KR',
       },
     ],
   },
